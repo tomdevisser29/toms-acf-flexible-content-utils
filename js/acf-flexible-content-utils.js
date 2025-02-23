@@ -1,5 +1,6 @@
 class FlexibleContentUtils {
   layouts = {};
+  currentFlexibleContent = null;
 
   constructor() {
     this.init();
@@ -7,7 +8,32 @@ class FlexibleContentUtils {
 
   init() {
     if (!window.acf) return;
-    this.addCustomLayoutControls();
+
+    document.addEventListener("DOMContentLoaded", () => {
+      this.addCustomLayoutControls();
+      this.addCustomLayoutActions();
+    });
+  }
+
+  addCustomLayoutActions() {
+    const postboxHeader = document.querySelector(
+      ".acf-postbox .handle-actions"
+    );
+
+    if (postboxHeader) {
+      const button = document.createElement("button");
+      button.className = "dashicons acf-paste-icon acf-js-tooltip";
+      button.dataset.name = "paste-layouts";
+      button.title = "Paste layouts from clipboard";
+
+      // Add an event listener for the button
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        this.pasteLayout();
+      });
+
+      postboxHeader.insertBefore(button, postboxHeader.firstChild);
+    }
   }
 
   addCustomLayoutControls() {
@@ -24,11 +50,9 @@ class FlexibleContentUtils {
         button.dataset.name = "copy-layout";
         button.title = "Copy layout";
 
-        layoutControls.insertBefore(button, layoutControls.firstChild);
-      });
-
-      document.querySelectorAll(".acf-copy-icon").forEach((button) => {
         button.addEventListener("click", this.copyLayout.bind(this));
+
+        layoutControls.insertBefore(button, layoutControls.firstChild);
       });
     });
   }
@@ -61,6 +85,49 @@ class FlexibleContentUtils {
       }
     } else {
       alert("Your browser does not support copying to clipboard.");
+    }
+  }
+
+  pasteLayout() {
+    const data = prompt("Paste in the copied layout you'd like to insert.");
+    if (!data) return;
+
+    try {
+      const { domain, acfFieldKey, layout } = JSON.parse(data);
+
+      // const layoutHtml = layout.closest("[data-layout]");
+      const container = document.createElement("div");
+      container.innerHTML = layout;
+
+      const layoutsHtml = container.querySelectorAll("[data-layout]");
+
+      const layoutGroupKey = document.querySelector(
+        ".acf-field-flexible-content"
+      ).dataset.key;
+
+      const flexibleContentModel = acf.models.FlexibleContentField.prototype;
+      flexibleContentModel.$el = this.layouts[layoutGroupKey].$el;
+      flexibleContentModel.cid = this.layouts[layoutGroupKey].cid;
+      this.currentFlexibleContent = flexibleContentModel;
+
+      const validatedLayouts = [];
+
+      layoutsHtml.forEach((layoutHtml) => {
+        const layoutName = layoutHtml.dataset.layout;
+        validatedLayouts.push(layoutHtml);
+      });
+
+      validatedLayouts.forEach((layoutHtml) => {
+        const dataId = layoutHtml.dataset.id;
+        const targetGroup = flexibleContentModel
+          .$control()
+          .find("input[type=hidden]")
+          .attr("name");
+
+        const uniqId = acf.uniqid();
+      });
+    } catch (e) {
+      console.error("Error while pasting layout: ", e);
     }
   }
 }

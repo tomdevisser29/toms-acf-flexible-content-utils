@@ -11,3 +11,25 @@
 .layout:hover .acf-copy-icon {
   visibility: visible;
 }
+
+.acf-postbox .postbox-header:hover .handle-actions .acf-hndle-cog {
+  display: none;
+}
+
+.acf-paste-icon {
+  background: 0 0;
+  border: 0;
+  color: #72777c;
+  cursor: pointer;
+  font-size: inherit;
+  height: 1.62rem;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  width: 1.62rem;
+}
+
+.acf-paste-icon::before {
+  content: "\f10f";
+  font-family: dashicons;
+}
