@@ -1,0 +1,13 @@
+.acf-copy-icon::before {
+  content: "\f481";
+  font-family: dashicons;
+  font-size: 14px;
+}
+
+.acf-copy-icon {
+  visibility: hidden;
+}
+
+.layout:hover .acf-copy-icon {
+  visibility: visible;
+}
