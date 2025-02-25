@@ -33,3 +33,8 @@
   content: "\f10f";
   font-family: dashicons;
 }
+
+.strl-appended-layout {
+  border: 1px solid #243363 !important;
+  box-shadow: 0 0 10px 1px rgba(36, 51, 99, 0.4);
+}
